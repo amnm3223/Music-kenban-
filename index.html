@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>まねっこ けんばんハーモニカ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            touch-action: manipulation;
+        }
+
+        /* 鍵盤が明るい黄色に光る強調スタイル */
+        .key-glow {
+            background-color: #fef08a !important; /* 明るい黄色 (Tailwind yellow-200相当) */
+            box-shadow: 0 0 30px #facc15, inset 0 0 15px #fef08a !important; /* 黄色の強い発光 */
+            border-color: #eab308 !important;
+            transform: translateY(2px);
+            z-index: 5;
+        }
+
+        /* アニメーション用 */
+        .bounce-active {
+            animation: bounce-once 0.3s ease-in-out;
+        }
+
+        @keyframes bounce-once {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+    </style>
+</head>
+<body class="bg-amber-50 min-h-screen flex flex-col justify-between items-center p-4 selection:bg-none">
+
+    <!-- Header Section -->
+    <header class="w-full max-w-4xl text-center my-2">
+        <h1 class="text-3xl md:text-5xl font-black text-amber-700 tracking-wider drop-shadow-sm mb-1">
+            🎵 まねっこ けんばんハーモニカ 🎵
+        </h1>
+        <p class="text-amber-800 text-sm md:text-base font-bold">
+            3つの おとを きめて、おともだちに まねっこ してもらおう！
+        </p>
+    </header>
+
+    <!-- Main Container -->
+    <main class="w-full max-w-4xl flex flex-col items-center gap-4 my-auto">
+
+        <!-- ◯◯◯ Display Box -->
+        <div class="bg-white border-4 border-amber-400 rounded-3xl p-4 md:p-6 shadow-lg w-full max-w-2xl text-center relative overflow-hidden">
+            <div class="absolute -top-6 -left-6 w-16 h-16 bg-yellow-200 rounded-full opacity-50"></div>
+            <div class="absolute -bottom-6 -right-6 w-20 h-20 bg-amber-200 rounded-full opacity-50"></div>
+
+            <div class="text-gray-500 font-bold text-sm md:text-lg mb-2">えらんだ おと</div>
+            
+            <!-- Three Slot Circles -->
+            <div class="flex justify-center items-center gap-3 md:gap-6 my-2">
+                <div id="slot-0" class="w-20 h-20 md:w-28 md:h-28 rounded-full border-4 border-dashed border-amber-300 bg-amber-50/50 flex items-center justify-center text-3xl md:text-5xl font-black transition-all shadow-inner">
+                    <span class="text-amber-300">◯</span>
+                </div>
+                <div id="slot-1" class="w-20 h-20 md:w-28 md:h-28 rounded-full border-4 border-dashed border-amber-300 bg-amber-50/50 flex items-center justify-center text-3xl md:text-5xl font-black transition-all shadow-inner">
+                    <span class="text-amber-300">◯</span>
+                </div>
+                <div id="slot-2" class="w-20 h-20 md:w-28 md:h-28 rounded-full border-4 border-dashed border-amber-300 bg-amber-50/50 flex items-center justify-center text-3xl md:text-5xl font-black transition-all shadow-inner">
+                    <span class="text-amber-300">◯</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons for Display Slot -->
+            <div class="flex justify-center gap-3 mt-4">
+                <button id="btn-play" onclick="playCurrentSequence()" class="bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-extrabold px-6 py-2.5 rounded-full text-base md:text-lg shadow-md flex items-center gap-2 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    おとを ならす
+                </button>
+                <button id="btn-random" onclick="generateRandomSequence()" class="bg-sky-500 hover:bg-sky-600 active:scale-95 text-white font-extrabold px-5 py-2.5 rounded-full text-base md:text-lg shadow-md transition">
+                    🎲 おだい（おまかせ）
+                </button>
+                <button id="btn-clear" onclick="clearSequence()" class="bg-rose-400 hover:bg-rose-500 active:scale-95 text-white font-extrabold px-4 py-2.5 rounded-full text-base md:text-lg shadow-md transition">
+                    けす
+                </button>
+            </div>
+        </div>
+
+        <!-- Note Selection Buttons (ド・レ・ミ・ファ・ソ) -->
+        <div class="w-full max-w-2xl bg-amber-200/60 p-3 rounded-2xl flex justify-center gap-2 md:gap-3 shadow-inner">
+            <button onclick="addNote('ド', 'C4')" class="note-selector flex-1 py-3 md:py-4 rounded-xl font-black text-xl md:text-3xl text-white bg-red-500 hover:bg-red-600 active:scale-90 shadow-md transition">ド</button>
+            <button onclick="addNote('レ', 'D4')" class="note-selector flex-1 py-3 md:py-4 rounded-xl font-black text-xl md:text-3xl text-white bg-orange-500 hover:bg-orange-600 active:scale-90 shadow-md transition">レ</button>
+            <button onclick="addNote('ミ', 'E4')" class="note-selector flex-1 py-3 md:py-4 rounded-xl font-black text-xl md:text-3xl text-white bg-yellow-400 hover:bg-yellow-500 active:scale-90 shadow-md transition">ミ</button>
+            <button onclick="addNote('ファ', 'F4')" class="note-selector flex-1 py-3 md:py-4 rounded-xl font-black text-xl md:text-3xl text-white bg-green-500 hover:bg-green-600 active:scale-90 shadow-md transition">ファ</button>
+            <button onclick="addNote('ソ', 'G4')" class="note-selector flex-1 py-3 md:py-4 rounded-xl font-black text-xl md:text-3xl text-white bg-blue-500 hover:bg-blue-600 active:scale-90 shadow-md transition">ソ</button>
+        </div>
+
+        <!-- Pianica Graphic Illustration Container -->
+        <div class="w-full max-w-3xl bg-blue-500 p-4 md:p-6 rounded-3xl shadow-2xl relative border-4 border-blue-600 flex flex-col items-center">
+            
+            <!-- Pianica Handle & Strap Details -->
+            <div class="absolute -left-3 top-1/2 transform -translate-y-1/2 w-4 h-24 bg-blue-700 rounded-l-lg border-l-2 border-blue-400"></div>
+            <div class="w-full flex justify-between items-center mb-2 px-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+                    <span class="text-white text-xs md:text-sm font-bold tracking-widest uppercase">Pianica / Melodica</span>
+                </div>
+                <!-- Blow pipe connector illustration -->
+                <div class="flex items-center gap-1 bg-blue-700 px-3 py-1 rounded-full border border-blue-400">
+                    <div class="w-4 h-2 bg-gray-200 rounded-sm"></div>
+                    <span class="text-xs text-blue-100 font-bold">ふきくち</span>
+                </div>
+            </div>
+
+            <!-- Keyboard Body -->
+            <div class="w-full bg-slate-900 p-2 md:p-4 rounded-2xl shadow-inner flex justify-center relative overflow-hidden">
+                
+                <!-- White & Black Keys Container -->
+                <div class="relative flex justify-center w-full max-w-2xl bg-slate-800 rounded-lg p-1">
+
+                    <!-- C4 (ド) -->
+                    <div id="key-C4" onclick="playDirectNote('ド', 'C4')" class="pianica-key relative flex-1 bg-white h-44 md:h-56 rounded-b-md border border-slate-300 cursor-pointer active:bg-slate-100 transition flex flex-col justify-end items-center pb-3 select-none">
+                        <span class="text-xs font-black text-gray-400 mb-1">C</span>
+                        <span class="w-8 h-8 rounded-full bg-red-500 text-white font-extrabold flex items-center justify-center text-sm shadow">ド</span>
+                    </div>
+
+                    <!-- Black Key C# -->
+                    <div class="absolute left-[11.5%] top-0 w-[7%] h-28 md:h-36 bg-slate-900 rounded-b-md z-10 border border-slate-700 shadow-md pointer-events-none"></div>
+
+                    <!-- D4 (レ) -->
+                    <div id="key-D4" onclick="playDirectNote('レ', 'D4')" class="pianica-key relative flex-1 bg-white h-44 md:h-56 rounded-b-md border border-slate-300 cursor-pointer active:bg-slate-100 transition flex flex-col justify-end items-center pb-3 select-none">
+                        <span class="text-xs font-black text-gray-400 mb-1">D</span>
+                        <span class="w-8 h-8 rounded-full bg-orange-500 text-white font-extrabold flex items-center justify-center text-sm shadow">レ</span>
+                    </div>
+
+                    <!-- Black Key D# -->
+                    <div class="absolute left-[25.8%] top-0 w-[7%] h-28 md:h-36 bg-slate-900 rounded-b-md z-10 border border-slate-700 shadow-md pointer-events-none"></div>
+
+                    <!-- E4 (ミ) -->
+                    <div id="key-E4" onclick="playDirectNote('ミ', 'E4')" class="pianica-key relative flex-1 bg-white h-44 md:h-56 rounded-b-md border border-slate-300 cursor-pointer active:bg-slate-100 transition flex flex-col justify-end items-center pb-3 select-none">
+                        <span class="text-xs font-black text-gray-400 mb-1">E</span>
+                        <span class="w-8 h-8 rounded-full bg-yellow-400 text-white font-extrabold flex items-center justify-center text-sm shadow">ミ</span>
+                    </div>
+
+                    <!-- F4 (ファ) -->
+                    <div id="key-F4" onclick="playDirectNote('ファ', 'F4')" class="pianica-key relative flex-1 bg-white h-44 md:h-56 rounded-b-md border border-slate-300 cursor-pointer active:bg-slate-100 transition flex flex-col justify-end items-center pb-3 select-none">
+                        <span class="text-xs font-black text-gray-400 mb-1">F</span>
+                        <span class="w-8 h-8 rounded-full bg-green-500 text-white font-extrabold flex items-center justify-center text-sm shadow">ファ</span>
+                    </div>
+
+                    <!-- Black Key F# -->
+                    <div class="absolute left-[54.5%] top-0 w-[7%] h-28 md:h-36 bg-slate-900 rounded-b-md z-10 border border-slate-700 shadow-md pointer-events-none"></div>
+
+                    <!-- G4 (ソ) -->
+                    <div id="key-G4" onclick="playDirectNote('ソ', 'G4')" class="pianica-key relative flex-1 bg-white h-44 md:h-56 rounded-b-md border border-slate-300 cursor-pointer active:bg-slate-100 transition flex flex-col justify-end items-center pb-3 select-none">
+                        <span class="text-xs font-black text-gray-400 mb-1">G</span>
+                        <span class="w-8 h-8 rounded-full bg-blue-500 text-white font-extrabold flex items-center justify-center text-sm shadow">ソ</span>
+                    </div>
+
+                    <!-- Black Key G# -->
+                    <div class="absolute left-[68.8%] top-0 w-[7%] h-28 md:h-36 bg-slate-900 rounded-b-md z-10 border border-slate-700 shadow-md pointer-events-none"></div>
+
+                    <!-- A4 (ラ) - Extra Key for context -->
+                    <div id="key-A4" class="pianica-key relative flex-1 bg-slate-100 h-44 md:h-56 rounded-b-md border border-slate-300 opacity-60 flex flex-col justify-end items-center pb-3 select-none">
+                        <span class="text-xs font-black text-gray-400 mb-1">A</span>
+                        <span class="w-7 h-7 rounded-full bg-purple-300 text-white font-bold flex items-center justify-center text-xs">ラ</span>
+                    </div>
+
+                    <!-- Black Key A# -->
+                    <div class="absolute left-[83%] top-0 w-[7%] h-28 md:h-36 bg-slate-900 rounded-b-md z-10 border border-slate-700 shadow-md opacity-60 pointer-events-none"></div>
+
+                    <!-- B4 (シ) - Extra Key for context -->
+                    <div id="key-B4" class="pianica-key relative flex-1 bg-slate-100 h-44 md:h-56 rounded-b-md border border-slate-300 opacity-60 flex flex-col justify-end items-center pb-3 select-none">
+                        <span class="text-xs font-black text-gray-400 mb-1">B</span>
+                        <span class="w-7 h-7 rounded-full bg-pink-300 text-white font-bold flex items-center justify-center text-xs">シ</span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Pianica Bottom Lip -->
+            <div class="w-full flex justify-center mt-2">
+                <div class="h-2 w-1/3 bg-blue-700 rounded-full"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center text-amber-700/70 text-xs mt-4">
+        しょうがっこう 1ねんせい おんがく「どれみと なかよく なろう」
+    </footer>
+
+    <!-- Web Audio API and Game Logic -->
+    <script>
+        // 音階と周波数の定義
+        const NOTE_FREQS = {
+            'C4': 261.63, // ド
+            'D4': 293.66, // レ
+            'E4': 329.63, // ミ
+            'F4': 349.23, // ファ
+            'G4': 392.00  // ソ
+        };
+
+        const NOTE_COLORS = {
+            'ド': 'bg-red-500 text-white border-red-600',
+            'レ': 'bg-orange-500 text-white border-orange-600',
+            'ミ': 'bg-yellow-400 text-white border-yellow-500',
+            'ファ': 'bg-green-500 text-white border-green-600',
+            'ソ': 'bg-blue-500 text-white border-blue-600'
+        };
+
+        const NOTE_NAME_TO_CODE = {
+            'ド': 'C4',
+            'レ': 'D4',
+            'ミ': 'E4',
+            'ファ': 'F4',
+            'ソ': 'G4'
+        };
+
+        // 状態変数
+        let selectedNotes = []; // [{name: 'ド', code: 'C4'}]
+        let audioCtx = null;
+
+        // Audio Contextの初期化（ブラウザ制限回避のためユーザー操作時に起動）
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // 鍵盤ハーモニカに近いハーモニクス音を合成して再生
+        function playSynthesizedNote(noteCode, duration = 0.6) {
+            initAudio();
+            const freq = NOTE_FREQS[noteCode];
+            if (!freq) return;
+
+            const osc1 = audioCtx.createOscillator();
+            const osc2 = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            // 鍵盤ハーモニカ（リード楽器）の波形合成：鋸波と三角波のミックス
+            osc1.type = 'sawtooth';
+            osc1.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+            osc2.type = 'triangle';
+            osc2.frequency.setValueAtTime(freq * 2, audioCtx.currentTime); // 1オクターブ上の倍音
+
+            const gain1 = audioCtx.createGain();
+            const gain2 = audioCtx.createGain();
+            gain1.gain.value = 0.5;
+            gain2.gain.value = 0.25;
+
+            osc1.connect(gain1);
+            osc2.connect(gain2);
+            gain1.connect(gainNode);
+            gain2.connect(gainNode);
+
+            // 音量エンベロープ（鍵盤ハーモニカらしい吹いた感じ）
+            const now = audioCtx.currentTime;
+            gainNode.gain.setValueAtTime(0, now);
+            gainNode.gain.linearRampToValueAtTime(0.3, now + 0.05); // アタック
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration); // リリース
+
+            gainNode.connect(audioCtx.destination);
+
+            osc1.start(now);
+            osc2.start(now);
+            osc1.stop(now + duration);
+            osc2.stop(now + duration);
+        }
+
+        // 音を追加
+        function addNote(name, code) {
+            if (selectedNotes.length >= 3) return;
+
+            selectedNotes.push({ name, code });
+            playSynthesizedNote(code, 0.4);
+            updateUI();
+        }
+
+        // 直接鍵盤を押したとき
+        function playDirectNote(name, code) {
+            playSynthesizedNote(code, 0.5);
+            highlightSingleKey(code);
+            if (selectedNotes.length < 3) {
+                addNote(name, code);
+            }
+        }
+
+        // クリア
+        function clearSequence() {
+            selectedNotes = [];
+            updateUI();
+        }
+
+        // ランダムおだい作成
+        function generateRandomSequence() {
+            const notes = [
+                { name: 'ド', code: 'C4' },
+                { name: 'レ', code: 'D4' },
+                { name: 'ミ', code: 'E4' },
+                { name: 'ファ', code: 'F4' },
+                { name: 'ソ', code: 'G4' }
+            ];
+            
+            selectedNotes = [];
+            for (let i = 0; i < 3; i++) {
+                const randIndex = Math.floor(Math.random() * notes.length);
+                selectedNotes.push(notes[randIndex]);
+            }
+            updateUI();
+            playCurrentSequence();
+        }
+
+        // 現在の3つの音を順番に鳴らす
+        async function playCurrentSequence() {
+            if (selectedNotes.length === 0) return;
+
+            const btnPlay = document.getElementById('btn-play');
+            btnPlay.disabled = true;
+
+            for (let i = 0; i < selectedNotes.length; i++) {
+                const note = selectedNotes[i];
+                
+                // スロットをピョンと弾ませる
+                const slotEl = document.getElementById(`slot-${i}`);
+                if (slotEl) {
+                    slotEl.classList.add('bounce-active');
+                    setTimeout(() => slotEl.classList.remove('bounce-active'), 300);
+                }
+
+                // 該当する鍵盤を光らせて音を鳴らす
+                highlightSingleKey(note.code, 0.6);
+                playSynthesizedNote(note.code, 0.7);
+
+                // 音と音の間隔
+                await new Promise(resolve => setTimeout(resolve, 650));
+            }
+
+            btnPlay.disabled = false;
+        }
+
+        // 特定の鍵盤を一定時間光らせる
+        function highlightSingleKey(code, duration = 0.5) {
+            const keyEl = document.getElementById(`key-${code}`);
+            if (keyEl) {
+                keyEl.classList.add('key-glow');
+                setTimeout(() => {
+                    // 常時光らせる対象でなければ消す
+                    if (!selectedNotes.some(n => n.code === code)) {
+                        keyEl.classList.remove('key-glow');
+                    }
+                }, duration * 1000);
+            }
+        }
+
+        // UI表示の全体更新
+        function updateUI() {
+            // 3つのスロット表示の更新
+            for (let i = 0; i < 3; i++) {
+                const slot = document.getElementById(`slot-${i}`);
+                if (selectedNotes[i]) {
+                    const note = selectedNotes[i];
+                    const colorClass = NOTE_COLORS[note.name];
+                    slot.className = `w-20 h-20 md:w-28 md:h-28 rounded-full border-4 flex items-center justify-center text-3xl md:text-5xl font-black transition-all shadow-md ${colorClass}`;
+                    slot.textContent = note.name;
+                } else {
+                    slot.className = "w-20 h-20 md:w-28 md:h-28 rounded-full border-4 border-dashed border-amber-300 bg-amber-50/50 flex items-center justify-center text-3xl md:text-5xl font-black transition-all shadow-inner";
+                    slot.innerHTML = '<span class="text-amber-300">◯</span>';
+                }
+            }
+
+            // 「おとをならす」ボタンの活性化チェック
+            document.getElementById('btn-play').disabled = (selectedNotes.length === 0);
+        }
+
+        // 特定の鍵盤を一定時間光らせる（単一の音だけを点灯させる）
+        function highlightSingleKey(code, duration = 0.5) {
+            // 一旦すべての鍵盤の光りを消す
+            document.querySelectorAll('.pianica-key').forEach(el => {
+                el.classList.remove('key-glow');
+            });
+
+            // 対象の鍵盤だけを光らせる
+            const keyEl = document.getElementById(`key-${code}`);
+            if (keyEl) {
+                keyEl.classList.add('key-glow');
+                setTimeout(() => {
+                    keyEl.classList.remove('key-glow');
+                }, duration * 1000);
+            }
+        }
+
+        // 初期ロード時
+        window.onload = function() {
+            updateUI();
+        };
+    </script>
+</body>
+</html>
